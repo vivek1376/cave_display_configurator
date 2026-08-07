@@ -40,27 +40,25 @@
             gap: 4px;
         }
 
-        /* 9:16 Cells with Sharp Edges, CRT Glass Sheen & Steeper Glow */
+        /* 9:16 Cells with Sharp Edges, Reduced CRT Glass Sheen & Steeper Glow */
         .display-cell {
             aspect-ratio: 9 / 16;
             border: 1px solid var(--border-dark);
+            position: relative; /* Required for z-index to work on selected state */
             
             box-shadow: 
                 inset 2px 2px 0px rgba(255,255,255,0.15), 
                 inset -2px -2px 0px rgba(0,0,0,0.7),
                 2px 2px 4px rgba(0,0,0,0.4);
             
-            /* Stronger offline glow */
             --glow-color: rgba(255, 20, 20, 0.9); 
             
             /* 
-               Layer 1: Intense glow with steep 35% fall-off
-               Layer 2: Glass sheen with a sharp diagonal cutoff at 45%-46%
-               Layer 3: CRT Vignette/Emboss
+               Reduced glass sheen intensity by ~20%
             */
             background-image: 
                 radial-gradient(circle at 0% 0%, var(--glow-color) 0%, transparent 35%),
-                linear-gradient(110deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.05) 45%, rgba(255,255,255,0) 46%, rgba(0,0,0,0.25) 100%),
+                linear-gradient(110deg, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0.04) 45%, rgba(255,255,255,0) 46%, rgba(0,0,0,0.2) 100%),
                 linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0) 10%, rgba(0,0,0,0) 90%, rgba(0,0,0,0.5) 100%);
             background-color: var(--panel);
             
@@ -75,7 +73,6 @@
         }
 
         .display-cell.online {
-            /* Stronger online glow */
             --glow-color: rgba(0, 255, 40, 0.9);
         }
 
@@ -86,9 +83,18 @@
             transform: translate(1px, 1px);
         }
 
+        /* Amber glow with 2px solid mask */
         .display-cell.selected {
-            border-color: #00a8ff;
+            border-color: #ffb000;
             background-color: #3d4f5d;
+            z-index: 10;
+            
+            box-shadow: 
+                inset 2px 2px 0px rgba(255,255,255,0.15), 
+                inset -2px -2px 0px rgba(0,0,0,0.7),
+                2px 2px 4px rgba(0,0,0,0.4),
+                0 0 0 2px var(--bg), 
+                0 0 15px 4px rgba(255, 176, 0, 0.8);
         }
 
         .cell-id { 
@@ -102,7 +108,7 @@
             text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
         }
 
-        /* Power User Control Panel (Bottom Edge) */
+        /* Power User Control Panel */
         .control-panel {
             flex-shrink: 0;
             padding: 20px;
