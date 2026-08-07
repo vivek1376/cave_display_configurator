@@ -10,8 +10,6 @@
             --border-light: #555;
             --border-dark: #111;
             --text: #e0e0e0;
-            --online: #00ff41;
-            --offline: #ff2a2a;
         }
         
         body {
@@ -19,12 +17,21 @@
             color: var(--text);
             font-family: 'Consolas', 'Courier New', monospace;
             margin: 0;
-            padding: 20px;
+            padding: 0; /* Removed global padding */
             display: flex;
             flex-direction: column;
             height: 100vh;
             box-sizing: border-box;
             user-select: none;
+        }
+
+        /* Container to keep margins for the top grid */
+        .wall-container {
+            padding: 20px;
+            flex-grow: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
         }
 
         /* 2x20 Grid Setup */
@@ -33,26 +40,42 @@
             grid-template-columns: repeat(20, 1fr);
             grid-template-rows: repeat(2, auto);
             gap: 4px;
-            margin-bottom: 20px;
         }
 
-        /* 9:16 Cells with Sharp 3D Motif */
+        /* 9:16 Cells with Sharp Edges, 3D Border & CRT Glass FX */
         .display-cell {
             aspect-ratio: 9 / 16;
-            background: var(--panel);
             border: 1px solid var(--border-dark);
+            
+            /* The 3D structural border */
             box-shadow: 
                 inset 2px 2px 0px rgba(255,255,255,0.1), 
                 inset -2px -2px 0px rgba(0,0,0,0.6),
                 2px 2px 4px rgba(0,0,0,0.4);
+            
+            /* Default offline glow color */
+            --glow-color: rgba(255, 42, 42, 0.4); 
+            
+            /* Layered Backgrounds: Status Glow -> Glass Reflection -> Vignette/Emboss -> Base Color */
+            background-image: 
+                radial-gradient(circle at 0% 0%, var(--glow-color) 0%, transparent 70%),
+                linear-gradient(135deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0) 35%, rgba(0,0,0,0.2) 100%),
+                linear-gradient(to bottom, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0) 10%, rgba(0,0,0,0) 90%, rgba(0,0,0,0.4) 100%);
+            background-color: var(--panel);
+            
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: space-between;
-            padding: 4px;
+            padding: 8px 4px 4px 4px;
             font-size: 0.75rem;
             cursor: pointer;
-            transition: all 0.05s linear;
+            transition: transform 0.05s linear;
+        }
+
+        .display-cell.online {
+            /* Switch glow to green when online */
+            --glow-color: rgba(0, 255, 65, 0.45);
         }
 
         .display-cell:active {
@@ -63,48 +86,51 @@
         }
 
         .display-cell.selected {
-            background: #3d4f5d;
             border-color: #00a8ff;
+            /* Enhance the glow slightly when selected */
+            background-color: #3d4f5d;
         }
 
-        .status-indicator {
-            width: 8px;
-            height: 8px;
-            background: var(--offline);
-            box-shadow: inset 1px 1px 2px rgba(0,0,0,0.5);
-            margin-top: 4px;
+        .cell-id { 
+            font-weight: bold; 
+            font-size: 0.9rem;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8); /* Helps text pop over the glow */
         }
 
-        .status-indicator.online { background: var(--online); }
+        .cell-pwr {
+            font-size: 0.6rem;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+        }
 
-        .cell-id { font-weight: bold; font-size: 0.9rem; }
-
-        /* Power User Control Panel */
+        /* Power User Control Panel (Bottom Edge) */
         .control-panel {
-            flex-grow: 1;
-            background: var(--panel);
-            border: 1px solid var(--border-dark);
-            box-shadow: 
-                inset 2px 2px 0px rgba(255,255,255,0.1), 
-                inset -2px -2px 0px rgba(0,0,0,0.6);
-            padding: 15px;
+            flex-shrink: 0;
+            padding: 20px;
             display: flex;
             flex-direction: column;
+            
+            /* Flat, dark, edge-to-edge with SVG noise for salt/pepper texture */
+            background-color: #0c0c0c;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.08'/%3E%3C/svg%3E");
+            
+            border: none;
+            box-shadow: 0px -4px 10px rgba(0,0,0,0.5); /* Cast shadow upwards */
         }
 
         .panel-header {
-            border-bottom: 1px solid var(--border-dark);
+            border-bottom: 1px solid #333;
             padding-bottom: 10px;
             margin-bottom: 15px;
             font-weight: bold;
             text-transform: uppercase;
             letter-spacing: 1px;
+            color: #aaa;
         }
 
         .action-group {
             display: flex;
             gap: 10px;
-            margin-bottom: 15px;
+            margin-bottom: 5px;
             align-items: center;
         }
 
@@ -113,7 +139,7 @@
             background: linear-gradient(180deg, #4a4a4a 0%, #2d2d2d 100%);
             color: var(--text);
             border: 1px solid var(--border-dark);
-            border-radius: 0; /* Strict sharp corners */
+            border-radius: 0; 
             padding: 8px 16px;
             font-family: inherit;
             font-weight: bold;
@@ -135,8 +161,10 @@
 </head>
 <body>
 
-    <div class="wall-grid" id="grid">
-        <!-- Cells generated by JS -->
+    <div class="wall-container">
+        <div class="wall-grid" id="grid">
+            <!-- Cells generated by JS -->
+        </div>
     </div>
 
     <div class="control-panel">
@@ -145,7 +173,7 @@
         <div class="action-group" id="controls" style="display: none;">
             <button onclick="sendCommand('power', 'on')">PWR ON</button>
             <button class="danger" onclick="sendCommand('power', 'off')">PWR OFF</button>
-            <span style="margin: 0 15px; border-left: 1px solid var(--border-light); height: 20px;"></span>
+            <span style="margin: 0 15px; border-left: 1px solid #333; height: 20px;"></span>
             <button onclick="sendCommand('source', 'HDMI1')">HDMI 1</button>
             <button onclick="sendCommand('source', 'HDMI2')">HDMI 2</button>
             <button onclick="sendCommand('source', 'DisplayPort')">DP</button>
@@ -161,10 +189,10 @@
             const cell = document.createElement('div');
             cell.className = 'display-cell';
             cell.id = `cell-${i}`;
+            // The status indicator dot is removed; status is now handled by the cell background
             cell.innerHTML = `
-                <div class="status-indicator" id="status-${i}"></div>
                 <div class="cell-id">${String(i).padStart(2, '0')}</div>
-                <div style="font-size: 0.6rem" id="pwr-${i}">---</div>
+                <div class="cell-pwr" id="pwr-${i}">---</div>
             `;
             cell.onclick = () => selectDisplay(i);
             grid.appendChild(cell);
@@ -185,14 +213,14 @@
                 const data = await res.json();
                 
                 for (let i = 1; i <= 40; i++) {
-                    const statusDiv = document.getElementById(`status-${i}`);
+                    const cell = document.getElementById(`cell-${i}`);
                     const pwrDiv = document.getElementById(`pwr-${i}`);
                     
                     if (data[i].status === 'online') {
-                        statusDiv.className = 'status-indicator online';
+                        cell.classList.add('online');
                         pwrDiv.innerText = data[i].power;
                     } else {
-                        statusDiv.className = 'status-indicator';
+                        cell.classList.remove('online');
                         pwrDiv.innerText = 'OFFLINE';
                     }
                 }
@@ -208,11 +236,9 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ id: selectedId, command, value })
             });
-            // Force an immediate UI update
             updateStatus();
         }
 
-        // Poll frontend every 2 seconds to reflect backend cache
         setInterval(updateStatus, 2000);
         updateStatus();
     </script>
