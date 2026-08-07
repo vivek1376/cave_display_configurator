@@ -17,7 +17,7 @@
             color: var(--text);
             font-family: 'Consolas', 'Courier New', monospace;
             margin: 0;
-            padding: 0; /* Removed global padding */
+            padding: 0;
             display: flex;
             flex-direction: column;
             height: 100vh;
@@ -25,7 +25,6 @@
             user-select: none;
         }
 
-        /* Container to keep margins for the top grid */
         .wall-container {
             padding: 20px;
             flex-grow: 1;
@@ -34,7 +33,6 @@
             flex-direction: column;
         }
 
-        /* 2x20 Grid Setup */
         .wall-grid {
             display: grid;
             grid-template-columns: repeat(20, 1fr);
@@ -42,25 +40,28 @@
             gap: 4px;
         }
 
-        /* 9:16 Cells with Sharp Edges, 3D Border & CRT Glass FX */
+        /* 9:16 Cells with Sharp Edges, CRT Glass Sheen & Steeper Glow */
         .display-cell {
             aspect-ratio: 9 / 16;
             border: 1px solid var(--border-dark);
             
-            /* The 3D structural border */
             box-shadow: 
-                inset 2px 2px 0px rgba(255,255,255,0.1), 
-                inset -2px -2px 0px rgba(0,0,0,0.6),
+                inset 2px 2px 0px rgba(255,255,255,0.15), 
+                inset -2px -2px 0px rgba(0,0,0,0.7),
                 2px 2px 4px rgba(0,0,0,0.4);
             
-            /* Default offline glow color */
-            --glow-color: rgba(255, 42, 42, 0.4); 
+            /* Stronger offline glow */
+            --glow-color: rgba(255, 20, 20, 0.9); 
             
-            /* Layered Backgrounds: Status Glow -> Glass Reflection -> Vignette/Emboss -> Base Color */
+            /* 
+               Layer 1: Intense glow with steep 35% fall-off
+               Layer 2: Glass sheen with a sharp diagonal cutoff at 45%-46%
+               Layer 3: CRT Vignette/Emboss
+            */
             background-image: 
-                radial-gradient(circle at 0% 0%, var(--glow-color) 0%, transparent 70%),
-                linear-gradient(135deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0) 35%, rgba(0,0,0,0.2) 100%),
-                linear-gradient(to bottom, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0) 10%, rgba(0,0,0,0) 90%, rgba(0,0,0,0.4) 100%);
+                radial-gradient(circle at 0% 0%, var(--glow-color) 0%, transparent 35%),
+                linear-gradient(110deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.05) 45%, rgba(255,255,255,0) 46%, rgba(0,0,0,0.25) 100%),
+                linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0) 10%, rgba(0,0,0,0) 90%, rgba(0,0,0,0.5) 100%);
             background-color: var(--panel);
             
             display: flex;
@@ -74,8 +75,8 @@
         }
 
         .display-cell.online {
-            /* Switch glow to green when online */
-            --glow-color: rgba(0, 255, 65, 0.45);
+            /* Stronger online glow */
+            --glow-color: rgba(0, 255, 40, 0.9);
         }
 
         .display-cell:active {
@@ -87,14 +88,13 @@
 
         .display-cell.selected {
             border-color: #00a8ff;
-            /* Enhance the glow slightly when selected */
             background-color: #3d4f5d;
         }
 
         .cell-id { 
             font-weight: bold; 
             font-size: 0.9rem;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.8); /* Helps text pop over the glow */
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
         }
 
         .cell-pwr {
@@ -109,12 +109,11 @@
             display: flex;
             flex-direction: column;
             
-            /* Flat, dark, edge-to-edge with SVG noise for salt/pepper texture */
             background-color: #0c0c0c;
             background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.08'/%3E%3C/svg%3E");
             
             border: none;
-            box-shadow: 0px -4px 10px rgba(0,0,0,0.5); /* Cast shadow upwards */
+            box-shadow: 0px -4px 10px rgba(0,0,0,0.5);
         }
 
         .panel-header {
@@ -134,7 +133,6 @@
             align-items: center;
         }
 
-        /* Hardware-style Buttons */
         button {
             background: linear-gradient(180deg, #4a4a4a 0%, #2d2d2d 100%);
             color: var(--text);
@@ -183,13 +181,11 @@
     <script>
         let selectedId = null;
 
-        // Initialize Grid
         const grid = document.getElementById('grid');
         for (let i = 1; i <= 40; i++) {
             const cell = document.createElement('div');
             cell.className = 'display-cell';
             cell.id = `cell-${i}`;
-            // The status indicator dot is removed; status is now handled by the cell background
             cell.innerHTML = `
                 <div class="cell-id">${String(i).padStart(2, '0')}</div>
                 <div class="cell-pwr" id="pwr-${i}">---</div>
