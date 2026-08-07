@@ -83,8 +83,8 @@
 
         /* 
            Selected State Fixes:
-           - Border remains dark (no amber border color to conflict).
-           - Box shadow strictly overwrites the white inset highlight.
+           - Border remains dark.
+           - Reduced blur and spread for a steeper, brighter glow.
         */
         .display-cell.selected {
             background-color: #3d4f5d;
@@ -94,7 +94,7 @@
             box-shadow: 
                 inset -2px -2px 0px rgba(0,0,0,0.7), /* Keeps inner dark depth only */
                 0 0 0 2px var(--bg),                 /* 2px dark gap matching background */
-                0 0 15px 4px rgba(255, 176, 0, 0.8); /* Amber outer glow */
+                0 0 8px 1px rgba(255, 204, 0, 1);    /* Steeper, brighter amber outer glow */
         }
 
         .cell-id { 
