@@ -83,18 +83,20 @@
 
         /* 
            Selected State Fixes:
-           - Border remains dark.
-           - Reduced blur and spread for a steeper, brighter glow.
+           - Amber border color applied directly to the cell border.
+           - 2px dark gap moved to an inner (inset) shadow to mask the screen effect.
+           - Amber outer glow emits directly from the border edge.
         */
         .display-cell.selected {
+            border-color: rgba(255, 204, 0, 1);
             background-color: #3d4f5d;
             z-index: 10;
             outline: none;
             
             box-shadow: 
-                inset -2px -2px 0px rgba(0,0,0,0.7), /* Keeps inner dark depth only */
-                0 0 0 2px var(--bg),                 /* 2px dark gap matching background */
-                0 0 8px 1px rgba(255, 204, 0, 1);    /* Steeper, brighter amber outer glow */
+                inset 0 0 0 2px var(--bg),           /* 2px dark gap INSIDE */
+                inset -2px -2px 0px rgba(0,0,0,0.7), /* Inner dark depth */
+                0 0 8px 1px rgba(255, 204, 0, 1);    /* Amber outer glow */
         }
 
         .cell-id { 
