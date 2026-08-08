@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <title>Video Wall Controller</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Six+Caps&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg: #1e1e1e;
@@ -93,14 +96,16 @@
         }
 
         .cell-id { 
-            font-weight: bold; 
-            font-size: 0.9rem;
+            font-family: 'Six Caps', sans-serif;
+            position: absolute;
+            bottom: 4px;
+            right: 8px;
+            font-size: 3rem;
+            color: #888;
+            letter-spacing: 2px;
+            line-height: 1;
             text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
-        }
-
-        .cell-pwr {
-            font-size: 0.6rem;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+            margin: 0;
         }
 
         /* Power User Control Panel */
@@ -189,7 +194,6 @@
             cell.id = `cell-${i}`;
             cell.innerHTML = `
                 <div class="cell-id">${String(i).padStart(2, '0')}</div>
-                <div class="cell-pwr" id="pwr-${i}">---</div>
             `;
             cell.onclick = () => selectDisplay(i);
             grid.appendChild(cell);
@@ -211,14 +215,11 @@
                 
                 for (let i = 1; i <= 40; i++) {
                     const cell = document.getElementById(`cell-${i}`);
-                    const pwrDiv = document.getElementById(`pwr-${i}`);
                     
                     if (data[i].status === 'online') {
                         cell.classList.add('online');
-                        pwrDiv.innerText = data[i].power;
                     } else {
                         cell.classList.remove('online');
-                        pwrDiv.innerText = 'OFFLINE';
                     }
                 }
             } catch (e) {
